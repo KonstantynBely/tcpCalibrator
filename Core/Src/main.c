@@ -92,8 +92,8 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(GPIO_OUT_GPIO_Port, GPIO_OUT_Pin, GPIO_PIN_SET);
-  HAL_GPIO_WritePin(LED_OUT_GPIO_Port, LED_OUT_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIO_OUT_GPIO_Port, GPIO_OUT_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(LED_OUT_GPIO_Port, LED_OUT_Pin, GPIO_PIN_RESET);
   HX711_Init();
   HAL_Delay(1000);
   /* USER CODE END 2 */
@@ -197,9 +197,9 @@ void checkInput(void)
     int32_t dev = HX711_Analyzer_GetDeviation();
     GPIO_PinState pinState = HAL_GPIO_ReadPin(TSYG_GPIO_Port, TSYG_Pin);
 
-    if (dev > 2000 || dev < -2000)
+    if (dev > 1500 || dev < -1500)
     {
-        if (checker < 10)
+        if (checker < 5)
         {
             checker++;
         }
@@ -211,18 +211,18 @@ void checkInput(void)
 
     uint8_t findContact = (pinState == GPIO_PIN_SET);
 
-    if ((checker >= 5 || findContact) && !triggered)
+    if ((checker >= 5) && !triggered)
     {
         triggered = 1;
 
         uint32_t czas = HAL_GetTick();
         printf("Wykryto kontakr narzędzia: %lu ms\r\n", czas);
 
-        HAL_GPIO_WritePin(LED_OUT_GPIO_Port, LED_OUT_Pin, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(GPIO_OUT_GPIO_Port, GPIO_OUT_Pin, GPIO_PIN_RESET);
-        HAL_Delay(200);
         HAL_GPIO_WritePin(LED_OUT_GPIO_Port, LED_OUT_Pin, GPIO_PIN_SET);
         HAL_GPIO_WritePin(GPIO_OUT_GPIO_Port, GPIO_OUT_Pin, GPIO_PIN_SET);
+        HAL_Delay(200);
+        HAL_GPIO_WritePin(LED_OUT_GPIO_Port, LED_OUT_Pin, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(GPIO_OUT_GPIO_Port, GPIO_OUT_Pin, GPIO_PIN_RESET);
 
         checker = 0;
         triggered = 0;
